@@ -3,5 +3,4 @@ build
 *.exe
 dist
 main.exe
-flappy_bird_venv
 cs218_hw3_v2_venv
