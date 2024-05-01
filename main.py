@@ -259,6 +259,8 @@ async def main():
     global gravity
     global bird_rect
 
+
+
     ############
     # main game loop
     #
