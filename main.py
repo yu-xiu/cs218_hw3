@@ -343,13 +343,13 @@ async def main():
             #
             pygame.display.update()
         else:
-            screen.fill((0, 0, 0))  # Fill the screen with black color
+            screen.fill((0, 0, 255))  
 
             # Render the pause message
-            font = pygame.font.Font(None, 36)  # Choose a font and size
-            text = font.render("PAUSED", True, (255, 255, 255))  # Render the text
-            text_rect = text.get_rect(center=(800 // 2, 600 // 2))  # Center the text
-            screen.blit(text, text_rect)  # Draw the text on the screen
+            font = pygame.font.Font(None, 36)
+            text = font.render("PAUSED", True, (255, 255, 255))
+            text_rect = text.get_rect(center=(800 // 2, 600 // 2))
+            screen.blit(text, text_rect)
 
             # Update the display
             pygame.display.flip()
