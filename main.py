@@ -260,6 +260,7 @@ async def main():
     global bird_rect
 
 
+    paused = False
 
     ############
     # main game loop
@@ -278,63 +279,80 @@ async def main():
                     action()
                 if event.key == pygame.K_ESCAPE:    # escape key
                     exit_app()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                action()
-            if event.type == SPAWNPIPE_EVT:  # handle custom events
-                pipe_rect_list.extend(create_pipe())  # add generated pipes tuple to the list
-            if event.type == BIRD_FLAP_EVT:
-                bird_surface, bird_rect = bird_animation()
+                if event.key == pygame.K_p:
+                    paused = not paused
+            if not paused:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    action()
+                if event.type == SPAWNPIPE_EVT:  # handle custom events
+                    pipe_rect_list.extend(create_pipe())  # add generated pipes tuple to the list
+                if event.type == BIRD_FLAP_EVT:
+                    bird_surface, bird_rect = bird_animation()
+            
+        if not paused:
+            
 
-        ############
-        # placing assets
-        # [wip] export all to sub functions?
-        #
+            ############
+            # placing assets
+            # [wip] export all to sub functions?
+            #
 
-        # place background: this will be static and not redrawn in the game loop
-        screen.blit(bg_surface, (0,0))  # [demo] origin of the surfaces is the top left, rectangle geometry will place the surface
+            # place background: this will be static and not redrawn in the game loop
+            screen.blit(bg_surface, (0,0))  # [demo] origin of the surfaces is the top left, rectangle geometry will place the surface
 
 
-        # the game  will have two modes: .... [wip]
-        # elements in an active game
-        if (game_active):
-            # placing the bird
-            bird_speed += gravity    # move the bird, maintain falling acceleration
-            bird_rect.centery += bird_speed
-            bird_rotated = rotate_bird(bird_surface)    # bird rotation animation
-            draw_bird(bird_rotated) # finally, draw the moving, rotated bird
+            # the game  will have two modes: .... [wip]
+            # elements in an active game
+            if (game_active):
+                # placing the bird
+                bird_speed += gravity    # move the bird, maintain falling acceleration
+                bird_rect.centery += bird_speed
+                bird_rotated = rotate_bird(bird_surface)    # bird rotation animation
+                draw_bird(bird_rotated) # finally, draw the moving, rotated bird
 
-            game_active = check_collisions(pipe_rect_list)
+                game_active = check_collisions(pipe_rect_list)
 
-            # placing the pipes
-            # [wip] parametrize this list properly
-            pipe_rect_list = move_pipes(pipe_rect_list)
-            draw_pipes(pipe_rect_list)
+                # placing the pipes
+                # [wip] parametrize this list properly
+                pipe_rect_list = move_pipes(pipe_rect_list)
+                draw_pipes(pipe_rect_list)
 
-            # placing the score
-            game_score +=1  # [wip] option: count score as pipes passed, add the sound [here] ...
-            #game_score_sound.play()
+                # placing the score
+                game_score +=1  # [wip] option: count score as pipes passed, add the sound [here] ...
+                #game_score_sound.play()
+            else:
+                update_highscore()
+                draw_highscore()    # inactive game screen will show the high score
+                screen.blit(greeting_surface, greeting_rect)
+
+            draw_score()
+
+            # placing the floor (it comes after the pipes so it will be drawn above)
+            # the floor will be moving regardless the game state
+            # [wip] move to function?
+            floor_x -= FLOOR_SPEED
+            # reset moving floor
+            if (floor_x <= -DISPLAY_WIDTH):
+                floor_x = 0
+            # [debug] print ("floor_x: " + str(floor_x))
+            draw_floor()
+
+
+            ############
+            # redraw the canvas
+            #
+            pygame.display.update()
         else:
-            update_highscore()
-            draw_highscore()    # inactive game screen will show the high score
-            screen.blit(greeting_surface, greeting_rect)
+            screen.fill((0, 0, 0))  # Fill the screen with black color
 
-        draw_score()
+            # Render the pause message
+            font = pygame.font.Font(None, 36)  # Choose a font and size
+            text = font.render("PAUSED", True, (255, 255, 255))  # Render the text
+            text_rect = text.get_rect(center=(800 // 2, 600 // 2))  # Center the text
+            screen.blit(text, text_rect)  # Draw the text on the screen
 
-        # placing the floor (it comes after the pipes so it will be drawn above)
-        # the floor will be moving regardless the game state
-        # [wip] move to function?
-        floor_x -= FLOOR_SPEED
-        # reset moving floor
-        if (floor_x <= -DISPLAY_WIDTH):
-            floor_x = 0
-        # [debug] print ("floor_x: " + str(floor_x))
-        draw_floor()
-
-
-        ############
-        # redraw the canvas
-        #
-        pygame.display.update()
+            # Update the display
+            pygame.display.flip()
         # set frame rate. some complex games may require frame limiting
         clock.tick(FPS)
         await asyncio.sleep(0)
