@@ -1,4 +1,6 @@
 # PyGame Doodle - Flappy Bird game clone
+## author and cloned from https://github.com/bbhitec/flappy_pygame
+## added a pause function and tried to use web assembly and aws to deploy it on web browser
 
 
 ## About
